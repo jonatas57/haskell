@@ -10,12 +10,12 @@ module Main where
 -- xmin vem antes de ymax
 -- e ymin vem antes de xmax
 overlap :: Ord a => (a, a) -> (a, a) -> Bool
-overlap (xmin, xmax) (ymin, ymax) = undefined
+overlap (xmin, xmax) (ymin, ymax) = xmin <= ymax && ymin <= xmax
 
 -- | Cria uma faixa de valores centrado em x e com raio r.
 -- retorna a tupla contendo x-r e x+r
 range :: Num a => a -> a -> (a, a)
-range x r = undefined
+range x r = (x-r,x+r)
 
 -- | Retorna se a bola colidiu com o jogador:
 -- (px, py) é o centro do retângulo representando o jogador
@@ -25,8 +25,8 @@ range x r = undefined
 paddleCollision :: (Float, Float) -> (Float, Float) -> (Float, Float) -> Float -> Bool
 paddleCollision (px, py) (l, a) (x, y) r = yCollision && xCollision
   where
-    yCollision    = undefined
-    xCollision    = undefined
+    yCollision    = overlap (range py metadeAltura) (range y r)
+    xCollision    = overlap (range px metadeLargura) (range x r)
     metadeAltura  = a / 2
     metadeLargura = l / 2
 
@@ -60,10 +60,10 @@ inCorner :: (Float, Float) -> (Float, Float) -> (Float, Float) -> Float -> Bool
 inCorner (bx, by) (l, a) (cx, cy) r = (leftOfBall || rightOfBall)
                                     && (topOfBall || bottomOfBall)
   where
-      leftOfBall   = undefined
-      rightOfBall  = undefined
-      bottomOfBall = undefined
-      topOfBall    = undefined
+      leftOfBall   = overlap (lmin, lmax) (cxmin, cxmax)
+      rightOfBall  = overlap ((-lmax), (-lmin)) (cxmin, cxmax)
+      bottomOfBall = overlap ((-amax), (-amin)) (cymin, cymax)
+      topOfBall    = overlap (amin, amax) (cymin, cymax)
       (lmin, lmax) = (0.3*l, 0.5*l)
       (amin, amax) = (0.3*a, 0.5*a)
       (cxmin, cxmax) = range cx r
